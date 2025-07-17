@@ -1,0 +1,4 @@
+com\concesionario\model\Vehiculo.class
+com\concesionario\ConcesionarioApplication.class
+com\concesionario\controller\VehiculoController.class
+com\concesionario\repository\VehiculoRepository.class
