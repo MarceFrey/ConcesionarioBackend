@@ -1,4 +1,7 @@
 com\concesionario\model\Vehiculo.class
+com\concesionario\controller\ImagenController.class
+com\concesionario\service\CloudinaryConfig.class
 com\concesionario\ConcesionarioApplication.class
+com\concesionario\service\CloudinaryService.class
 com\concesionario\controller\VehiculoController.class
 com\concesionario\repository\VehiculoRepository.class

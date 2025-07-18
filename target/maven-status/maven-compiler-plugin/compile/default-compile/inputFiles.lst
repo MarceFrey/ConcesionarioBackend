@@ -1,4 +1,7 @@
 C:\Users\oliva\OneDrive\Desktop\concesionario-backend\src\main\java\com\concesionario\model\Vehiculo.java
 C:\Users\oliva\OneDrive\Desktop\concesionario-backend\src\main\java\com\concesionario\ConcesionarioApplication.java
 C:\Users\oliva\OneDrive\Desktop\concesionario-backend\src\main\java\com\concesionario\controller\VehiculoController.java
+C:\Users\oliva\OneDrive\Desktop\concesionario-backend\src\main\java\com\concesionario\service\CloudinaryConfig.java
 C:\Users\oliva\OneDrive\Desktop\concesionario-backend\src\main\java\com\concesionario\repository\VehiculoRepository.java
+C:\Users\oliva\OneDrive\Desktop\concesionario-backend\src\main\java\com\concesionario\service\CloudinaryService.java
+C:\Users\oliva\OneDrive\Desktop\concesionario-backend\src\main\java\com\concesionario\controller\ImagenController.java

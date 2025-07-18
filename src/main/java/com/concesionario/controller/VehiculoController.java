@@ -2,16 +2,14 @@ package com.concesionario.controller;
 
 import com.concesionario.model.Vehiculo;
 import com.concesionario.repository.VehiculoRepository;
+import com.concesionario.service.CloudinaryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
-import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/vehiculos")
@@ -20,6 +18,9 @@ public class VehiculoController {
 
     @Autowired
     private VehiculoRepository repo;
+
+    @Autowired
+    private com.concesionario.service.CloudinaryService cloudinaryService;
 
     @PostMapping("/subir")
     public ResponseEntity<Vehiculo> subirVehiculo(
@@ -32,13 +33,10 @@ public class VehiculoController {
             @RequestParam String descripcion,
             @RequestParam List<MultipartFile> imagenes) throws IOException {
 
-        List<String> rutas = new ArrayList<>();
+        List<String> urls = new ArrayList<>();
         for (MultipartFile imagen : imagenes) {
-            String nombreArchivo = UUID.randomUUID() + "_" + imagen.getOriginalFilename();
-            Path path = Paths.get("uploads/" + nombreArchivo);
-            Files.createDirectories(path.getParent());
-            Files.write(path, imagen.getBytes());
-            rutas.add("/uploads/" + nombreArchivo);
+            String url = cloudinaryService.uploadImage(imagen);
+            urls.add(url); // Guarda la URL pública de Cloudinary
         }
 
         Vehiculo v = new Vehiculo();
@@ -49,7 +47,7 @@ public class VehiculoController {
         v.setKilometraje(kilometraje);
         v.setColor(color);
         v.setDescripcion(descripcion);
-        v.setImagenes(rutas);
+        v.setImagenes(urls);
 
         return ResponseEntity.ok(repo.save(v));
     }
