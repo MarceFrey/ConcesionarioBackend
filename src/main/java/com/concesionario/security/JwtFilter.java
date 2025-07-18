@@ -26,27 +26,38 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (header != null && header.startsWith("Bearer ")) {
             String token = header.replace("Bearer ", "");
+            System.out.println("✅ Token recibido: " + token);
+
             try {
                 if (jwtUtil.validarToken(token)) {
                     String email = jwtUtil.extraerEmail(token);
                     String rol = jwtUtil.getRolDesdeToken(token);
 
-                    // Spring necesita una lista de autoridades (roles)
+                    System.out.println("📧 Email extraído del token: " + email);
+                    System.out.println("🎭 Rol extraído del token: " + rol);
+
                     UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
                             email,
                             null,
-                            Collections.singletonList(new SimpleGrantedAuthority(rol))
+                            Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + rol)) // 👈 prefijo obligatorio
                     );
                     SecurityContextHolder.getContext().setAuthentication(auth);
+                    System.out.println("🔐 Autenticación registrada en SecurityContextHolder con rol: ROLE_" + rol);
+                } else {
+                    System.out.println("⚠️ El token no es válido según JwtUtil.");
                 }
             } catch (Exception e) {
+                System.out.println("❌ Error procesando token: " + e.getMessage());
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido");
                 return;
             }
+        } else {
+            System.out.println("⚠️ No se encontró un token válido en el header Authorization.");
         }
 
         filterChain.doFilter(request, response);
     }
 }
+
 
 
