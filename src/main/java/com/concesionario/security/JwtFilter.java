@@ -33,31 +33,32 @@ public class JwtFilter extends OncePerRequestFilter {
                     String email = jwtUtil.extraerEmail(token);
                     String rol = jwtUtil.getRolDesdeToken(token);
 
-                    System.out.println("📧 Email extraído del token: " + email);
-                    System.out.println("🎭 Rol extraído del token: " + rol);
+                    System.out.println("📧 Email extraído: " + email);
+                    System.out.println("🎭 Rol extraído: " + rol);
 
                     UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
                             email,
                             null,
-                            Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + rol)) // 👈 prefijo obligatorio
+                            Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + rol))
                     );
                     SecurityContextHolder.getContext().setAuthentication(auth);
-                    System.out.println("🔐 Autenticación registrada en SecurityContextHolder con rol: ROLE_" + rol);
+                    System.out.println("🔐 Auth registrada con rol: ROLE_" + rol);
                 } else {
-                    System.out.println("⚠️ El token no es válido según JwtUtil.");
+                    System.out.println("⚠️ Token inválido (no pasó validación)");
                 }
             } catch (Exception e) {
-                System.out.println("❌ Error procesando token: " + e.getMessage());
+                System.out.println("❌ Error en JwtFilter: " + e.getMessage());
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido");
                 return;
             }
         } else {
-            System.out.println("⚠️ No se encontró un token válido en el header Authorization.");
+            System.out.println("⚠️ No se encontró token Authorization válido.");
         }
 
         filterChain.doFilter(request, response);
     }
 }
+
 
 
 
