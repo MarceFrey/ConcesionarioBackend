@@ -12,7 +12,7 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    private static final String SECRET = "marcelo-super-clave-secreta-256"; // al menos 32 caracteres
+    private static final String SECRET = "marcelofrey-super-clave-secreta-256"; // al menos 32 caracteres
 
     // Bloque static para confirmar carga anticipada
     static {
