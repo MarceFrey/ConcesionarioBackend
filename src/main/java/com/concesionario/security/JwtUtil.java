@@ -12,8 +12,9 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    // Clave secreta generada aleatoriamente
-    private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    // Clave secreta desde variable de entorno
+    private static final String SECRET = System.getenv("SECRET_KEY");
+    private final Key key = Keys.hmacShaKeyFor(SECRET.getBytes());
 
     // Duración del token: 1 día en milisegundos
     private final long EXPIRATION_TIME = 1000 * 60 * 60 * 24;
@@ -52,13 +53,17 @@ public class JwtUtil {
     // Verificar que el token es válido y no expiró
     public boolean validarToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token);
             return true;
         } catch (JwtException e) {
             return false;
         }
     }
 }
+
 
 
 
