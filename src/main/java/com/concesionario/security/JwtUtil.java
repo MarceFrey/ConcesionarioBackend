@@ -12,29 +12,35 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    // Clave secreta desde variable de entorno (32+ caracteres)
+    // Leer la clave desde variable de entorno
     private static final String SECRET = System.getenv("SECRET_KEY");
 
-    // Creamos la clave a partir del string leído
-    private final Key key = Keys.hmacShaKeyFor(SECRET.getBytes());
+    // Clave segura usada para firmar y validar tokens
+    private final Key key;
 
-    // Constructor para mostrar log al iniciar el backend
+    // Constructor: loguea y valida que la clave sea válida
     public JwtUtil() {
         System.out.println("🔑 Clave desde entorno: " + SECRET);
         System.out.println("📏 Longitud de la clave: " + (SECRET != null ? SECRET.length() : "null"));
+
+        if (SECRET == null || SECRET.length() < 32) {
+            throw new IllegalStateException("❌ SECRET_KEY no definida o demasiado corta (mínimo 32 caracteres)");
+        }
+
+        this.key = Keys.hmacShaKeyFor(SECRET.getBytes());
     }
 
-    // Duración del token: 24 horas
+    // Duración: 24 horas
     private final long EXPIRATION_TIME = 1000 * 60 * 60 * 24;
 
-    // Generar token con claims
+    // Generar token con email y rol
     public String generarToken(String email, String rol) {
         return Jwts.builder()
                 .setSubject(email)
                 .claim("rol", rol)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(key)
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
@@ -72,8 +78,3 @@ public class JwtUtil {
         }
     }
 }
-
-
-
-
-
