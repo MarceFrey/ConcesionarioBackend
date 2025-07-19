@@ -12,14 +12,22 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    // Clave secreta desde variable de entorno
+    // Clave secreta desde variable de entorno (32+ caracteres)
     private static final String SECRET = System.getenv("SECRET_KEY");
+
+    // Creamos la clave a partir del string leído
     private final Key key = Keys.hmacShaKeyFor(SECRET.getBytes());
 
-    // Duración del token: 1 día en milisegundos
+    // Constructor para mostrar log al iniciar el backend
+    public JwtUtil() {
+        System.out.println("🔑 Clave desde entorno: " + SECRET);
+        System.out.println("📏 Longitud de la clave: " + (SECRET != null ? SECRET.length() : "null"));
+    }
+
+    // Duración del token: 24 horas
     private final long EXPIRATION_TIME = 1000 * 60 * 60 * 24;
 
-    // Generar un token con email y rol como claims
+    // Generar token con claims
     public String generarToken(String email, String rol) {
         return Jwts.builder()
                 .setSubject(email)
@@ -30,7 +38,7 @@ public class JwtUtil {
                 .compact();
     }
 
-    // Extraer email desde el token
+    // Extraer email (sub)
     public String extraerEmail(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
@@ -40,7 +48,7 @@ public class JwtUtil {
                 .getSubject();
     }
 
-    // Extraer rol desde el token
+    // Extraer rol
     public String getRolDesdeToken(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
@@ -50,7 +58,7 @@ public class JwtUtil {
                 .get("rol", String.class);
     }
 
-    // Verificar que el token es válido y no expiró
+    // Validar firma y expiración
     public boolean validarToken(String token) {
         try {
             Jwts.parserBuilder()
@@ -59,10 +67,12 @@ public class JwtUtil {
                     .parseClaimsJws(token);
             return true;
         } catch (JwtException e) {
+            System.out.println("❌ Error al validar token: " + e.getMessage());
             return false;
         }
     }
 }
+
 
 
 
