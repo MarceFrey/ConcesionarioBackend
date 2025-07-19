@@ -12,16 +12,19 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    // Leer la clave desde variable de entorno
     private static final String SECRET = System.getenv("SECRET_KEY");
 
-    // Clave segura usada para firmar y validar tokens
+    // Bloque estático para forzar logs apenas se carga la clase
+    static {
+        System.out.println("🧪 [STATIC] SECRET_KEY: " + SECRET);
+        System.out.println("📏 [STATIC] Largo: " + (SECRET != null ? SECRET.length() : "null"));
+    }
+
     private final Key key;
 
-    // Constructor: loguea y valida que la clave sea válida
     public JwtUtil() {
-        System.out.println("🔑 Clave desde entorno: " + SECRET);
-        System.out.println("📏 Longitud de la clave: " + (SECRET != null ? SECRET.length() : "null"));
+        System.out.println("🔑 [Constructor] Clave desde entorno: " + SECRET);
+        System.out.println("📏 [Constructor] Longitud de la clave: " + (SECRET != null ? SECRET.length() : "null"));
 
         if (SECRET == null || SECRET.length() < 32) {
             throw new IllegalStateException("❌ SECRET_KEY no definida o demasiado corta (mínimo 32 caracteres)");
@@ -30,10 +33,8 @@ public class JwtUtil {
         this.key = Keys.hmacShaKeyFor(SECRET.getBytes());
     }
 
-    // Duración: 24 horas
     private final long EXPIRATION_TIME = 1000 * 60 * 60 * 24;
 
-    // Generar token con email y rol
     public String generarToken(String email, String rol) {
         return Jwts.builder()
                 .setSubject(email)
@@ -44,7 +45,6 @@ public class JwtUtil {
                 .compact();
     }
 
-    // Extraer email (sub)
     public String extraerEmail(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
@@ -54,7 +54,6 @@ public class JwtUtil {
                 .getSubject();
     }
 
-    // Extraer rol
     public String getRolDesdeToken(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
@@ -64,7 +63,6 @@ public class JwtUtil {
                 .get("rol", String.class);
     }
 
-    // Validar firma y expiración
     public boolean validarToken(String token) {
         try {
             Jwts.parserBuilder()
@@ -78,3 +76,4 @@ public class JwtUtil {
         }
     }
 }
+
