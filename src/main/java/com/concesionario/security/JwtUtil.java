@@ -14,7 +14,7 @@ public class JwtUtil {
 
     private static final String SECRET = System.getenv("SECRET_KEY");
 
-    // Bloque estático para forzar logs apenas se carga la clase
+    // Bloque static para confirmar carga anticipada
     static {
         System.out.println("🧪 [STATIC] SECRET_KEY: " + SECRET);
         System.out.println("📏 [STATIC] Largo: " + (SECRET != null ? SECRET.length() : "null"));
@@ -24,7 +24,7 @@ public class JwtUtil {
 
     public JwtUtil() {
         System.out.println("🔑 [Constructor] Clave desde entorno: " + SECRET);
-        System.out.println("📏 [Constructor] Longitud de la clave: " + (SECRET != null ? SECRET.length() : "null"));
+        System.out.println("📏 [Constructor] Longitud: " + (SECRET != null ? SECRET.length() : "null"));
 
         if (SECRET == null || SECRET.length() < 32) {
             throw new IllegalStateException("❌ SECRET_KEY no definida o demasiado corta (mínimo 32 caracteres)");
@@ -76,4 +76,3 @@ public class JwtUtil {
         }
     }
 }
-
