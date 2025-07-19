@@ -1,9 +1,9 @@
 package com.concesionario.security;
 
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.JwtException;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -12,28 +12,21 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    private static final String SECRET = "marcelofrey-super-clave-secreta-256"; // al menos 32 caracteres
+    private Key key;
 
-    // Bloque static para confirmar carga anticipada
-    static {
-        System.out.println("🧪 [STATIC] SECRET_KEY: " + SECRET);
-        System.out.println("📏 [STATIC] Largo: " + (SECRET != null ? SECRET.length() : "null"));
-    }
+    @Value("${SECRET_KEY}")
+    private String secretKey;
 
-    private final Key key;
+    private final long EXPIRATION_TIME = 1000 * 60 * 60 * 24; // 24 horas
 
-    public JwtUtil() {
-        System.out.println("🔑 [Constructor] Clave desde entorno: " + SECRET);
-        System.out.println("📏 [Constructor] Longitud: " + (SECRET != null ? SECRET.length() : "null"));
-
-        if (SECRET == null || SECRET.length() < 32) {
-            throw new IllegalStateException("❌ SECRET_KEY no definida o demasiado corta (mínimo 32 caracteres)");
+    @PostConstruct
+    public void init() {
+        System.out.println("🔐 [Init] SECRET_KEY desde @Value: " + secretKey);
+        if (secretKey == null || secretKey.length() < 32) {
+            throw new IllegalStateException("❌ SECRET_KEY no definida o demasiado corta");
         }
-
-        this.key = Keys.hmacShaKeyFor(SECRET.getBytes());
+        this.key = Keys.hmacShaKeyFor(secretKey.getBytes());
     }
-
-    private final long EXPIRATION_TIME = 1000 * 60 * 60 * 24;
 
     public String generarToken(String email, String rol) {
         return Jwts.builder()
