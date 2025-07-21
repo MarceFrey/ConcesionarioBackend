@@ -1,11 +1,16 @@
 package com.concesionario.controller;
 
+import com.concesionario.model.AuthRequest;
 import com.concesionario.model.Usuario;
 import com.concesionario.repository.UsuarioRepository;
 import com.concesionario.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -19,18 +24,29 @@ public class AuthController {
     @Autowired
     private JwtUtil jwtUtil;
 
-    @PostMapping("/login")
-    public Map<String, Object> login(@RequestBody Usuario login) {
-        Usuario user = usuarioRepository.findByEmail(login.getEmail())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-        if (!user.getPassword().equals(login.getPassword())) {
-            throw new RuntimeException("Credenciales inválidas");
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody AuthRequest request) {
+        Usuario usuario = usuarioRepository.findByEmail(request.getEmail()).orElse(null);
+
+        if (usuario == null || !passwordEncoder.matches(request.getPassword(), usuario.getPassword())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales inválidas");
         }
 
-        String token = jwtUtil.generarToken(user.getEmail(), user.getRol());
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("rol", "ROLE_" + usuario.getRol()); // para que funcione con hasRole()
 
-        return Map.of("token", token, "rol", user.getRol());
+        String token = jwtUtil.generateToken(claims, usuario.getEmail());
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("token", token);
+        response.put("rol", usuario.getRol());
+
+        return ResponseEntity.ok(response);
     }
+
 }
+
 
