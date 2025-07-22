@@ -29,14 +29,26 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequest request) {
+        System.out.println("🔐 Intentando login para: " + request.getEmail());
+
         Usuario usuario = usuarioRepository.findByEmail(request.getEmail()).orElse(null);
 
-        if (usuario == null || !passwordEncoder.matches(request.getPassword(), usuario.getPassword())) {
+        if (usuario == null) {
+            System.out.println("❌ Usuario no encontrado");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales inválidas");
+        }
+
+        System.out.println("🔑 Contraseña enviada: " + request.getPassword());
+        System.out.println("🔒 Contraseña en BD: " + usuario.getPassword());
+        boolean coinciden = passwordEncoder.matches(request.getPassword(), usuario.getPassword());
+        System.out.println("✅ ¿Coinciden? " + coinciden);
+
+        if (!coinciden) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales inválidas");
         }
 
         Map<String, Object> claims = new HashMap<>();
-        claims.put("rol", "ROLE_" + usuario.getRol()); // para que funcione con hasRole()
+        claims.put("rol", "ROLE_" + usuario.getRol());
 
         String token = jwtUtil.generateToken(claims, usuario.getEmail());
 
@@ -44,9 +56,8 @@ public class AuthController {
         response.put("token", token);
         response.put("rol", usuario.getRol());
 
+        System.out.println("🎫 Token generado correctamente para: " + usuario.getEmail());
+
         return ResponseEntity.ok(response);
     }
-
 }
-
-
