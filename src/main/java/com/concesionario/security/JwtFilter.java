@@ -27,12 +27,10 @@ public class JwtFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
 
         final String authHeader = request.getHeader("Authorization");
-
         String token = null;
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
-
             System.out.println("✅ Token recibido: " + token);
 
             try {
@@ -44,24 +42,32 @@ public class JwtFilter extends OncePerRequestFilter {
 
                 if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-                    UserDetails userDetails = org.springframework.security.core.userdetails.User
-                            .withUsername(email)
-                            .password("") // no se necesita para validar JWT
-                            .authorities(rol) // ← Aquí es donde se inyecta el rol (ej: ROLE_ADMIN)
-                            .build();
+                    // ⚠️ Rol debe ser no-nulo y válido
+                    if (rol == null || rol.isBlank()) {
+                        System.out.println("❌ Rol inválido en el token.");
+                    } else {
+                        UserDetails userDetails = org.springframework.security.core.userdetails.User
+                                .withUsername(email)
+                                .password("") // no se usa aquí
+                                .authorities(rol) // ← inyectamos el rol con ROLE_ prefijado
+                                .build();
 
-                    if (jwtUtil.validateToken(token, userDetails)) {
-                        UsernamePasswordAuthenticationToken authToken =
-                                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                        SecurityContextHolder.getContext().setAuthentication(authToken);
-                        System.out.println("✅ Usuario autenticado correctamente");
+                        if (jwtUtil.validateToken(token, userDetails)) {
+                            UsernamePasswordAuthenticationToken authToken =
+                                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                            authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                            SecurityContextHolder.getContext().setAuthentication(authToken);
+                            System.out.println("✅ Usuario autenticado correctamente");
+                        } else {
+                            System.out.println("❌ Token inválido o expirado.");
+                        }
                     }
                 }
 
             } catch (Exception e) {
                 System.out.println("❌ Error al procesar el token: " + e.getMessage());
             }
+
         } else {
             System.out.println("❌ No se encontró un token válido en el header Authorization.");
         }
@@ -69,6 +75,7 @@ public class JwtFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 }
+
 
 
 
