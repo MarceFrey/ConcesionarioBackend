@@ -13,9 +13,18 @@ public class PasswordDebugConfig {
         return args -> {
             String raw = "admin";
             String hash = "$2a$10$kTME.JLHzBGVnK0VQ53jYOIxxUsLuCr4pMVRozhABd7zQuJk8FCie";
-
             boolean ok = passwordEncoder.matches(raw, hash);
             System.out.println("🧪 Test interno: ¿'admin' coincide con el hash?: " + ok);
         };
     }
+
+    @Bean
+    public CommandLineRunner generarHash(PasswordEncoder encoder) {
+        return args -> {
+            String rawPassword = "admin";
+            String hashed = encoder.encode(rawPassword);
+            System.out.println("🔑 Hashed password: " + hashed);
+        };
+    }
 }
+

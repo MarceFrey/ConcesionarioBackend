@@ -4,12 +4,13 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -18,50 +19,57 @@ import java.util.Collections;
 public class JwtFilter extends OncePerRequestFilter {
 
     @Autowired
-    private JwtUtil jwtUtil; // ✅ inyectado desde Spring
+    private JwtUtil jwtUtil;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
-                                    FilterChain filterChain)
-            throws ServletException, IOException {
+                                    FilterChain filterChain) throws ServletException, IOException {
 
-        String header = request.getHeader("Authorization");
+        final String authHeader = request.getHeader("Authorization");
 
-        if (header != null && header.startsWith("Bearer ")) {
-            String token = header.replace("Bearer ", "");
+        String token = null;
+
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            token = authHeader.substring(7);
+
             System.out.println("✅ Token recibido: " + token);
 
             try {
-                if (jwtUtil.validarToken(token)) {
-                    String email = jwtUtil.extraerEmail(token);
-                    String rol = jwtUtil.getRolDesdeToken(token);
+                String email = jwtUtil.extractUsername(token);
+                String rol = jwtUtil.extractRol(token);
 
-                    System.out.println("📧 Email extraído: " + email);
-                    System.out.println("🎭 Rol extraído: " + rol);
+                System.out.println("✅ Email extraído del token: " + email);
+                System.out.println("✅ Rol extraído del token: " + rol);
 
-                    UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                            email,
-                            null,
-                            Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + rol))
-                    );
-                    SecurityContextHolder.getContext().setAuthentication(auth);
-                    System.out.println("🔐 Auth registrada con rol: ROLE_" + rol);
-                } else {
-                    System.out.println("⚠️ Token inválido (no pasó validación)");
+                if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+
+                    UserDetails userDetails = org.springframework.security.core.userdetails.User
+                            .withUsername(email)
+                            .password("") // no se necesita para validar JWT
+                            .authorities(rol) // ← Aquí es donde se inyecta el rol (ej: ROLE_ADMIN)
+                            .build();
+
+                    if (jwtUtil.validateToken(token, userDetails)) {
+                        UsernamePasswordAuthenticationToken authToken =
+                                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authToken);
+                        System.out.println("✅ Usuario autenticado correctamente");
+                    }
                 }
+
             } catch (Exception e) {
-                System.out.println("❌ Error en JwtFilter: " + e.getMessage());
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido");
-                return;
+                System.out.println("❌ Error al procesar el token: " + e.getMessage());
             }
         } else {
-            System.out.println("⚠️ No se encontró token Authorization válido.");
+            System.out.println("❌ No se encontró un token válido en el header Authorization.");
         }
 
         filterChain.doFilter(request, response);
     }
 }
+
 
 
 
