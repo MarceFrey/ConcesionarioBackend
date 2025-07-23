@@ -24,15 +24,25 @@ public class SecurityConfig {
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.GET, "/api/vehiculos").permitAll()     // ✅ público
-                        .requestMatchers("/api/vehiculos/**").hasRole("ADMIN")             // ✅ protegido
-                        .requestMatchers("/auth/**").permitAll()                           // login/register
-                        .anyRequest().authenticated()                                      // el resto
+                        // ✅ Rutas públicas para el frontend
+                        .requestMatchers(HttpMethod.GET, "/api/vehiculos").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/vehiculos/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/imagenes/**").permitAll()
+
+                        // ✅ Login / register públicos
+                        .requestMatchers("/auth/**").permitAll()
+
+                        // 🔐 Las demás rutas de vehículos requieren rol ADMIN
+                        .requestMatchers("/api/vehiculos/**").hasRole("ADMIN")
+
+                        // 🔐 Todo lo demás requiere autenticación
+                        .anyRequest().authenticated()
                 )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
