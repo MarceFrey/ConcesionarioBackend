@@ -21,14 +21,6 @@ public class CloudinaryConfig {
         );
         return new Cloudinary(config);
     }
-    @Bean
-    public CommandLineRunner generarHash(PasswordEncoder encoder) {
-        return args -> {
-            String rawPassword = "admin";
-            String hashed = encoder.encode(rawPassword);
-            System.out.println("🔑 Hashed password: " + hashed);
-        };
-    }
 }
 
 
