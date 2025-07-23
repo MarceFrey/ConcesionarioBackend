@@ -70,7 +70,10 @@ public class JwtFilter extends OncePerRequestFilter {
 
         } else {
             System.out.println("❌ No se encontró un token válido en el header Authorization.");
+            filterChain.doFilter(request, response);
+            return; // ⬅️ ⚠️ Esto es lo que faltaba
         }
+
 
         filterChain.doFilter(request, response);
     }
