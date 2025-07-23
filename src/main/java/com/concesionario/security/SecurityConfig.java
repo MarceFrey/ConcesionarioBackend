@@ -24,16 +24,21 @@ public class SecurityConfig {
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // ✅ Hacer todo público para métodos GET en /api/vehiculos/**
-                        .requestMatchers(HttpMethod.GET, "/api/vehiculos/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/imagenes/**").permitAll()
 
-                        // ✅ Login y registro
+                        // ✅ Login y registro públicos
                         .requestMatchers("/auth/**").permitAll()
 
-                        // 🔐 Rutas de edición (POST/PUT/DELETE) protegidas
-                        .requestMatchers("/api/vehiculos/**").hasRole("ADMIN")
+                        // ✅ GET públicos para ver vehículos e imágenes
+                        .requestMatchers(HttpMethod.GET, "/api/vehiculos").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/vehiculos/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/imagenes/**").permitAll()
 
+                        // 🔐 Protegido: subir, editar, borrar vehículos (solo ADMIN)
+                        .requestMatchers(HttpMethod.POST, "/api/vehiculos/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/vehiculos/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/vehiculos/**").hasRole("ADMIN")
+
+                        // 🔐 Cualquier otra petición requiere autenticación
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -41,12 +46,12 @@ public class SecurityConfig {
                 .build();
     }
 
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 }
+
 
 
 
