@@ -24,18 +24,16 @@ public class SecurityConfig {
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // ✅ Rutas públicas para el frontend
-                        .requestMatchers(HttpMethod.GET, "/api/vehiculos").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/vehiculos/*").permitAll()
+                        // ✅ Hacer todo público para métodos GET en /api/vehiculos/**
+                        .requestMatchers(HttpMethod.GET, "/api/vehiculos/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/imagenes/**").permitAll()
 
-                        // ✅ Login / register públicos
+                        // ✅ Login y registro
                         .requestMatchers("/auth/**").permitAll()
 
-                        // 🔐 Las demás rutas de vehículos requieren rol ADMIN
+                        // 🔐 Rutas de edición (POST/PUT/DELETE) protegidas
                         .requestMatchers("/api/vehiculos/**").hasRole("ADMIN")
 
-                        // 🔐 Todo lo demás requiere autenticación
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
