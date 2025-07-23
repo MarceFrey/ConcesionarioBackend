@@ -29,6 +29,13 @@ public class JwtFilter extends OncePerRequestFilter {
         final String path = request.getRequestURI();
         final String method = request.getMethod();
 
+        if ((method.equals("GET") && path.startsWith("/api/vehiculos")) ||
+                (method.equals("GET") && path.startsWith("/api/imagenes")) ||
+                path.startsWith("/auth")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         // ⚠️ Si no hay token y la ruta es pública, dejamos pasar sin tocar el contexto de seguridad
         if ((authHeader == null || !authHeader.startsWith("Bearer ")) &&
                 method.equals("GET") && (path.startsWith("/api/vehiculos") || path.startsWith("/api/imagenes"))) {
