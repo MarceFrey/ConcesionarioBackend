@@ -37,6 +37,10 @@ public class AuthController {
             System.out.println("❌ Usuario no encontrado");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales inválidas");
         }
+        System.out.println("🔍 Email recibido: " + request.getEmail());
+        System.out.println("🔍 Password recibido: " + request.getPassword());
+        System.out.println("🔍 Password hash en la base: " + usuario.getPassword());
+        System.out.println("🧪 Coincide?: " + passwordEncoder.matches(request.getPassword(), usuario.getPassword()));
 
         System.out.println("🔑 Contraseña enviada: " + request.getPassword());
         System.out.println("🔒 Contraseña en BD: " + usuario.getPassword());
