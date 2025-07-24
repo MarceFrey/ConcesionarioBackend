@@ -25,10 +25,11 @@ public class JwtFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        final String authHeader = request.getHeader("Authorization");
         final String path = request.getRequestURI();
         final String method = request.getMethod();
+        final String authHeader = request.getHeader("Authorization");
 
+        // 🚫 Si es una ruta pública, no procesamos el filtro de JWT
         if ((method.equals("GET") && path.startsWith("/api/vehiculos")) ||
                 (method.equals("GET") && path.startsWith("/api/imagenes")) ||
                 path.startsWith("/auth")) {
@@ -36,13 +37,7 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        // ⚠️ Si no hay token y la ruta es pública, dejamos pasar sin tocar el contexto de seguridad
-        if ((authHeader == null || !authHeader.startsWith("Bearer ")) &&
-                method.equals("GET") && (path.startsWith("/api/vehiculos") || path.startsWith("/api/imagenes"))) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
+        // ✅ Si hay token, intentamos procesarlo
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
             System.out.println("✅ Token recibido: " + token);
@@ -51,14 +46,11 @@ public class JwtFilter extends OncePerRequestFilter {
                 String email = jwtUtil.extractUsername(token);
                 String rol = jwtUtil.extractRol(token);
 
-                System.out.println("✅ Email extraído del token: " + email);
-                System.out.println("✅ Rol extraído del token: " + rol);
-
                 if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     if (rol != null && !rol.isBlank()) {
                         UserDetails userDetails = org.springframework.security.core.userdetails.User
                                 .withUsername(email)
-                                .password("") // sin usar
+                                .password("") // no se usa aquí
                                 .authorities(rol)
                                 .build();
 
@@ -79,11 +71,13 @@ public class JwtFilter extends OncePerRequestFilter {
             } catch (Exception e) {
                 System.out.println("❌ Error al procesar el token: " + e.getMessage());
             }
+        } else {
+            System.out.println("❌ No se encontró un token válido en el header Authorization.");
         }
 
-        // Siempre continuar con la cadena del filtro
         filterChain.doFilter(request, response);
     }
+
 }
 
 

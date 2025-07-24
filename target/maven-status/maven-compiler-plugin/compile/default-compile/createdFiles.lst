@@ -4,12 +4,14 @@ com\concesionario\security\PasswordDebugConfig.class
 com\concesionario\security\JwtFilter.class
 com\concesionario\service\CloudinaryConfig.class
 com\concesionario\ConcesionarioApplication.class
+com\concesionario\config\CorsConfig$1.class
 com\concesionario\controller\VehiculoController.class
 com\concesionario\controller\AuthController.class
 com\concesionario\repository\VehiculoRepository.class
 com\concesionario\security\JwtUtil.class
 com\concesionario\repository\UsuarioRepository.class
 com\concesionario\controller\ImagenController.class
+com\concesionario\config\CorsConfig.class
 com\concesionario\model\Usuario$UsuarioBuilder.class
 com\concesionario\model\AuthRequest.class
 com\concesionario\model\Usuario.class
