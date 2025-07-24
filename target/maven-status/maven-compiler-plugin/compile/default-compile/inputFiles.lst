@@ -1,6 +1,7 @@
 C:\Users\oliva\OneDrive\Desktop\concesionario-backend\src\main\java\com\concesionario\security\JwtFilter.java
 C:\Users\oliva\OneDrive\Desktop\concesionario-backend\src\main\java\com\concesionario\controller\AuthController.java
 C:\Users\oliva\OneDrive\Desktop\concesionario-backend\src\main\java\com\concesionario\repository\UsuarioRepository.java
+C:\Users\oliva\OneDrive\Desktop\concesionario-backend\src\main\java\com\concesionario\config\AdminInitConfig.java
 C:\Users\oliva\OneDrive\Desktop\concesionario-backend\src\main\java\com\concesionario\config\CorsConfig.java
 C:\Users\oliva\OneDrive\Desktop\concesionario-backend\src\main\java\com\concesionario\repository\VehiculoRepository.java
 C:\Users\oliva\OneDrive\Desktop\concesionario-backend\src\main\java\com\concesionario\security\JwtUtil.java
@@ -11,6 +12,5 @@ C:\Users\oliva\OneDrive\Desktop\concesionario-backend\src\main\java\com\concesio
 C:\Users\oliva\OneDrive\Desktop\concesionario-backend\src\main\java\com\concesionario\model\Vehiculo.java
 C:\Users\oliva\OneDrive\Desktop\concesionario-backend\src\main\java\com\concesionario\ConcesionarioApplication.java
 C:\Users\oliva\OneDrive\Desktop\concesionario-backend\src\main\java\com\concesionario\controller\VehiculoController.java
-C:\Users\oliva\OneDrive\Desktop\concesionario-backend\src\main\java\com\concesionario\security\PasswordDebugConfig.java
 C:\Users\oliva\OneDrive\Desktop\concesionario-backend\src\main\java\com\concesionario\service\CloudinaryConfig.java
 C:\Users\oliva\OneDrive\Desktop\concesionario-backend\src\main\java\com\concesionario\model\AuthRequest.java
