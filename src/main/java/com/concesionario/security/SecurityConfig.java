@@ -27,6 +27,8 @@ public class SecurityConfig {
 
                         // ✅ Login y registro públicos
                         .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+
 
                         // ✅ GET públicos para ver vehículos e imágenes
                         .requestMatchers(HttpMethod.GET, "/api/vehiculos").permitAll()
