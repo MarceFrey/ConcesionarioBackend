@@ -7,10 +7,10 @@ com\concesionario\config\CorsConfig$1.class
 com\concesionario\controller\VehiculoController.class
 com\concesionario\controller\AuthController.class
 com\concesionario\repository\VehiculoRepository.class
-com\concesionario\config\AdminInitConfig.class
 com\concesionario\security\JwtUtil.class
 com\concesionario\repository\UsuarioRepository.class
 com\concesionario\controller\ImagenController.class
+com\concesionario\config\AdminUserInitializer.class
 com\concesionario\config\CorsConfig.class
 com\concesionario\model\Usuario$UsuarioBuilder.class
 com\concesionario\model\AuthRequest.class
