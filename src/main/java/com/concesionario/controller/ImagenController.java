@@ -11,7 +11,6 @@ import java.nio.file.*;
 
 @RestController
 @RequestMapping("/imagenes")
-@CrossOrigin("*")
 public class ImagenController {
 
     private final Path uploadPath = Paths.get("uploads");
