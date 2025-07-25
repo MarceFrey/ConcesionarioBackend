@@ -62,6 +62,10 @@ public class AuthController {
         response.put("rol", usuario.getRol());
 
         System.out.println("✅ Login exitoso, token generado para: " + email);
+        System.out.println("📨 Email: " + email);
+        System.out.println("🔑 Password enviado: " + password);
+        System.out.println("🔒 Hash guardado en DB: " + usuario.getPassword());
+        System.out.println("🔄 Coinciden? " + passwordEncoder.matches(password, usuario.getPassword()));
 
         return ResponseEntity.ok(response);
     }
