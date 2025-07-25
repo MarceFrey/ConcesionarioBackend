@@ -4,8 +4,10 @@ import com.concesionario.model.AuthRequest;
 import com.concesionario.model.Usuario;
 import com.concesionario.repository.UsuarioRepository;
 import com.concesionario.security.JwtUtil;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +17,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
+@CrossOrigin(origins = "https://www.automotorescbabuenosaires.com.ar", allowCredentials = "true")
 public class AuthController {
 
     @Autowired
@@ -26,41 +29,41 @@ public class AuthController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @PostMapping("/login")
+    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> login(@RequestBody AuthRequest request) {
-        System.out.println("🔐 Intentando login para: " + request.getEmail());
+        String email = request.getEmail().trim();
+        String password = request.getPassword().trim();
 
-        Usuario usuario = usuarioRepository.findByEmail(request.getEmail()).orElse(null);
+        System.out.println("🔐 Intentando login para: " + email);
+
+        Usuario usuario = usuarioRepository.findByEmail(email).orElse(null);
 
         if (usuario == null) {
-            System.out.println("❌ Usuario no encontrado");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales inválidas");
-        }
-        System.out.println("🔍 Email recibido: " + request.getEmail());
-        System.out.println("🔍 Password recibido: " + request.getPassword());
-        System.out.println("🔍 Password hash en la base: " + usuario.getPassword());
-        System.out.println("🧪 Coincide?: " + passwordEncoder.matches(request.getPassword(), usuario.getPassword()));
-
-        System.out.println("🔑 Contraseña enviada: " + request.getPassword());
-        System.out.println("🔒 Contraseña en BD: " + usuario.getPassword());
-        boolean coinciden = passwordEncoder.matches(request.getPassword(), usuario.getPassword());
-        System.out.println("✅ ¿Coinciden? " + coinciden);
-
-        if (!coinciden) {
+            System.out.println("❌ Usuario no encontrado en la base de datos");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales inválidas");
         }
 
+        System.out.println("🔍 Hash guardado: " + usuario.getPassword());
+        System.out.println("🔍 Verificando contraseña...");
+
+        if (!passwordEncoder.matches(password, usuario.getPassword())) {
+            System.out.println("❌ Contraseña incorrecta");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales inválidas");
+        }
+
+        // Claims adicionales (como el rol)
         Map<String, Object> claims = new HashMap<>();
         claims.put("rol", "ROLE_" + usuario.getRol());
 
-        String token = jwtUtil.generateToken(claims, usuario.getEmail());
+        String token = jwtUtil.generateToken(claims, email);
 
         Map<String, Object> response = new HashMap<>();
         response.put("token", token);
         response.put("rol", usuario.getRol());
 
-        System.out.println("🎫 Token generado correctamente para: " + usuario.getEmail());
+        System.out.println("✅ Login exitoso, token generado para: " + email);
 
         return ResponseEntity.ok(response);
     }
 }
+
