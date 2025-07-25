@@ -14,8 +14,8 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("https://www.automotorescbabuenosaires.com.ar") // Tu frontend
-                        .allowedMethods("*") // GET, POST, PUT, DELETE, etc.
+                        .allowedOriginPatterns("https://www.automotorescbabuenosaires.com.ar")
+                        .allowedMethods("*")
                         .allowedHeaders("*")
                         .allowCredentials(true);
             }
