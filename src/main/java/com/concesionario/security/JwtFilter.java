@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -48,10 +49,12 @@ public class JwtFilter extends OncePerRequestFilter {
 
                 if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     if (rol != null && !rol.isBlank()) {
+                        System.out.println("🔐 Asignando autoridad: " + rol);
+
                         UserDetails userDetails = org.springframework.security.core.userdetails.User
                                 .withUsername(email)
                                 .password("") // no se usa aquí
-                                .authorities(rol)
+                                .authorities(new SimpleGrantedAuthority(rol)) // 👈 cambio clave
                                 .build();
 
                         if (jwtUtil.validateToken(token, userDetails)) {
@@ -79,6 +82,7 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
 }
+
 
 
 
