@@ -17,21 +17,20 @@ public class AdminUserInitializer {
     private PasswordEncoder passwordEncoder;
 
     @PostConstruct
-    public void crearAdminSiNoExiste() {
+    public void recrearAdmin() {
         String email = "admin@prueba";
-        String passwordPlano = "admin123";
+        String passwordPlano = "admin123";  // Esta va a ser tu nueva contraseña segura
         String rol = "ADMIN";
-
-        boolean existe = usuarioRepository.findByEmail(email).isPresent();
 
         usuarioRepository.findByEmail(email).ifPresent(usuarioRepository::delete);
 
         Usuario admin = new Usuario();
         admin.setEmail(email);
-        admin.setPassword(passwordEncoder.encode(passwordPlano)); // por ejemplo "admin123"
+        admin.setPassword(passwordEncoder.encode(passwordPlano));
         admin.setRol(rol);
         usuarioRepository.save(admin);
-        System.out.println("✅ Usuario ADMIN recreado con nueva contraseña");
 
+        System.out.println("✅ Usuario ADMIN recreado con nueva contraseña: " + passwordPlano);
     }
 }
+
