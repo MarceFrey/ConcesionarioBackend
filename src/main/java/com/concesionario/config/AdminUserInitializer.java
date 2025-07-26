@@ -24,15 +24,14 @@ public class AdminUserInitializer {
 
         boolean existe = usuarioRepository.findByEmail(email).isPresent();
 
-        if (!existe) {
-            Usuario admin = new Usuario();
-            admin.setEmail(email);
-            admin.setPassword(passwordEncoder.encode(passwordPlano));
-            admin.setRol(rol);
-            usuarioRepository.save(admin);
-            System.out.println("✅ Usuario ADMIN creado");
-        } else {
-            System.out.println("🟡 Usuario ADMIN ya existe, no se vuelve a crear");
-        }
+        usuarioRepository.findByEmail(email).ifPresent(usuarioRepository::delete);
+
+        Usuario admin = new Usuario();
+        admin.setEmail(email);
+        admin.setPassword(passwordEncoder.encode(passwordPlano)); // por ejemplo "admin123"
+        admin.setRol(rol);
+        usuarioRepository.save(admin);
+        System.out.println("✅ Usuario ADMIN recreado con nueva contraseña");
+
     }
 }
