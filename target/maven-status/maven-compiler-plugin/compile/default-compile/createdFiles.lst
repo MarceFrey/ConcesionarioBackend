@@ -1,5 +1,6 @@
 com\concesionario\model\Vehiculo.class
 com\concesionario\security\SecurityConfig.class
+com\concesionario\test\VerificarHash.class
 com\concesionario\security\JwtFilter.class
 com\concesionario\service\CloudinaryConfig.class
 com\concesionario\ConcesionarioApplication.class
